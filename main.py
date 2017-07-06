@@ -8,7 +8,7 @@ BASE_URL = "https://api.instagram.com/v1/"
 def my_info():
 
     request_url = BASE_URL + 'users/self/?access_token=%s' % ACCESS_TOKEN
-    print 'GET request url : %s' % request_url
+
     my_info = requests.get(request_url).json()
 
     if my_info['meta']['code'] == 200:
@@ -18,15 +18,14 @@ def my_info():
             print 'No. of people you are following: %s' % (my_info['data']['counts']['follows'])
             print 'No. of posts: %s' % (my_info['data']['counts']['media'])
         else:
-            print 'User does not exist!'
+            print 'Please Check the name'
     else:
-        print 'Status code other than 200 received'
-my_info()
+        print 'Status Not Ok'
+
 
 
 def get_friend_id(insta_user):
     request_url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (insta_user, ACCESS_TOKEN)
-    print 'GET request url : %s' % request_url
     friend_info = requests.get(request_url).json()
     if friend_info['meta']['code'] == 200:
         if len(friend_info['data']):
@@ -42,7 +41,6 @@ def get_friend_info(insta_user):
     if friend_id == None:
         print 'User does not exist!'
     request_url = (BASE_URL + 'users/%s?access_token=%s') % (friend_id, ACCESS_TOKEN)
-    print 'GET request url : %s' % request_url
     friend_info = requests.get(request_url).json()
 
     if friend_info['meta']['code'] == 200:
@@ -72,17 +70,19 @@ def get_my_post():
     else:
         print 'Status code other than 200 received!'
 
+def start_app():
+    print 'a. Look into your own account'
+    print 'b. Look into your friends account'
+    print 'c. Look at your recent media'
 
 
-
-
-
-
-
-insta_user = raw_input('enter the user name')
-
-
-
-
-
-get_friend_info(insta_user)
+    your_choice = raw_input("Enter your choice")
+    if your_choice == "a":
+        my_info()
+    if your_choice == "b":
+        insta_user = raw_input('enter the user name')
+        get_friend_info(insta_user)
+    if your_choice == "c":
+        get_my_post()
+    if your_choice == "d":
+        print'please enter a valid choice'
