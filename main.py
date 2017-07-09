@@ -20,7 +20,7 @@ def my_info():
         else:
             print 'Please Check the name'
     else:
-        print 'Status Not Ok'
+        print 'STATUS NOT OK'
 
 
 
@@ -33,7 +33,7 @@ def get_friend_id(insta_user):
         else:
             return None
     else:
-        print 'Network Problem'
+        print 'STATUS NOT OK'
 
 
 def get_friend_info(insta_user):
@@ -52,11 +52,10 @@ def get_friend_info(insta_user):
         else:
             print 'There is no data for this user!'
     else:
-        print 'Status code other than 200 received!'
+        print 'STATUS NOT OK'
 
 def get_my_post():
-    request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (APP_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
+    request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (ACCESS_TOKEN)
     own_media = requests.get(request_url).json()
 
     if own_media['meta']['code'] == 200:
@@ -70,10 +69,36 @@ def get_my_post():
     else:
         print 'Status code other than 200 received!'
 
+def friend_media():
+    #first i need to search for the user and after that get's its id and store it's id.
+    friend_name=raw_input('enter the name of your frnd :')
+    url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (friend_name, ACCESS_TOKEN)
+    friend_details = requests.get(url).json()
+    if friend_details['meta']['code'] == 200:
+        if len(friend_details['data']):
+            id = (friend_details['data'][0]['id'])
+            request_url=(BASE_URL+'users/%s/media/recent/?access_token=%s'%(id,ACCESS_TOKEN))
+            details_frnd=requests.get(request_url).json()
+            if len(details_frnd['data']):
+                image_name = details_frnd['data'][0]['id'] + '.jpeg'
+                #x=details_frnd['data'][0]['id']
+                image_url = details_frnd['data'][0]['images']['standard_resolution']['url']
+                urllib.urlretrieve(image_url, image_name)
+                print 'image has been downloaded'
+
+            else:
+                 print 'data does not exist'
+        else:
+            print 'user not exist'
+    else:
+        print 'status error occured'
+
+
 def start_app():
     print 'a. Look into your own account'
     print 'b. Look into your friends account'
     print 'c. Look at your recent media'
+    print 'd. Look at your friends recent media'
 
 
     your_choice = raw_input("Enter your choice")
@@ -85,4 +110,6 @@ def start_app():
     if your_choice == "c":
         get_my_post()
     if your_choice == "d":
-        print'please enter a valid choice'
+        friend_media()
+
+start_app()
