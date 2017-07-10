@@ -111,7 +111,7 @@ def like_a_post():
                     if post_like['meta']['code']==200:
                         print('Post liked')
                     else:
-                        print 'error'
+                        print 'Try again later'
 
                 else:
                     print 'Try again later'
@@ -119,9 +119,9 @@ def like_a_post():
             else:
                 print 'STATUS NOT OK'
         else:
-            print 'user data does not exist'
+            print 'wrong input name '
     else:
-        print 'status error '
+        print 'STATUS NOT OK'
 
 
 
