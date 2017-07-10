@@ -81,7 +81,6 @@ def friend_media():
             details_frnd=requests.get(request_url).json()
             if len(details_frnd['data']):
                 image_name = details_frnd['data'][0]['id'] + '.jpeg'
-                #x=details_frnd['data'][0]['id']
                 image_url = details_frnd['data'][0]['images']['standard_resolution']['url']
                 urllib.urlretrieve(image_url, image_name)
                 print 'image has been downloaded'
@@ -94,11 +93,46 @@ def friend_media():
         print 'status error occured'
 
 
+def like_a_post():
+    name = raw_input('enter your friend name')
+    search_url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (name, ACCESS_TOKEN)
+    friend_details=requests.get(search_url).json()
+    if friend_details['meta']['code'] == 200:
+        if len(friend_details['data']):
+            id = (friend_details['data'][0]['id'])
+            request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s' % (id, ACCESS_TOKEN))
+            post_details = requests.get(request_url).json()
+            if post_details['meta']['code']==200:
+                if len(post_details['data']):
+                    post_id=post_details['data'][0]['id']
+                    set_url=(BASE_URL+'media/%s/likes')%(post_id)
+                    payLoad={'access_token':ACCESS_TOKEN}
+                    post_like=requests.post(set_url,payLoad).json()
+                    if post_like['meta']['code']==200:
+                        print('Post liked')
+                    else:
+                        print 'error'
+
+                else:
+                    print 'Try again later'
+
+            else:
+                print 'STATUS NOT OK'
+        else:
+            print 'user data does not exist'
+    else:
+        print 'status error '
+
+
+
+
+
 def start_app():
     print 'a. Look into your own account'
     print 'b. Look into your friends account'
     print 'c. Look at your recent media'
     print 'd. Look at your friends recent media'
+    print 'e. Want to like your friends post?'
 
 
     your_choice = raw_input("Enter your choice")
@@ -111,5 +145,6 @@ def start_app():
         get_my_post()
     if your_choice == "d":
         friend_media()
-
+    if your_choice == "e":
+        like_a_post()
 start_app()
