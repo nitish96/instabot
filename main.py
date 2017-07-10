@@ -50,12 +50,12 @@ def get_friend_info(insta_user):
             print 'No. of people you are following: %s' % (friend_info['data']['counts']['follows'])
             print 'No. of posts: %s' % (friend_info['data']['counts']['media'])
         else:
-            print 'There is no data for this user!'
+            print 'oops! no data found'
     else:
         print 'STATUS NOT OK'
 
 def get_my_post():
-    request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (ACCESS_TOKEN)
+    request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % ACCESS_TOKEN
     own_media = requests.get(request_url).json()
 
     if own_media['meta']['code'] == 200:
@@ -124,7 +124,40 @@ def like_a_post():
         print 'STATUS NOT OK'
 
 
+def post_a_comment():
+    name = raw_input('enter the name of the user :')
+    url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (name, ACCESS_TOKEN)
+    friend_details = requests.get(url).json()
+    if friend_details['meta']['code'] == 200:
 
+        if len(friend_details['data']):
+
+            id = (friend_details['data'][0]['id'])
+            request_url = (url + 'users/%s/media/recent/?access_token=%s' % (id, ACCESS_TOKEN))
+            show_media_details = requests.get(request_url).json()
+            if show_media_details['meta']['code'] == 200:
+
+                if len(show_media_details['data']):
+                    media_id = show_media_details['data'][0]['id']
+                    set_url = (BASE_URL + 'media/%s/comments') % (media_id)
+                    comment_input = raw_input('enter your comment: ')
+                    comment_payLoad = {'access_token': ACCESS_TOKEN, 'text': comment_input}
+                    post_comment = requests.post(set_url, comment_payLoad).json()
+                    if post_comment['meta']['code'] == 200:
+
+                        print('Comment added successfully!')
+                    else:
+                        print 'oops! try again '
+
+                else:
+                    print 'oops!no data found'
+
+            else:
+                print 'STATUS NOT OK'
+        else:
+            print 'oops! no data found'
+    else:
+        print 'STATUS NOT OK '
 
 
 def start_app():
