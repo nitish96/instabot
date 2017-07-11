@@ -1,10 +1,15 @@
-import requests,urllib
+import requests
+import termcolor
+import urllib
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
+caption = []
 ACCESS_TOKEN = "4067103159.e02ced5.354ea1cd0a9648469c69eadcbffa65b8"
 
 BASE_URL = "https://api.instagram.com/v1/"
 
-
+#this method will fetch my personal information
 def my_info():
 
     request_url = BASE_URL + 'users/self/?access_token=%s' % ACCESS_TOKEN
@@ -23,7 +28,7 @@ def my_info():
         print 'STATUS NOT OK'
 
 
-
+#this method is getting the id of my one of my friends
 def get_friend_id(insta_user):
     request_url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (insta_user, ACCESS_TOKEN)
     friend_info = requests.get(request_url).json()
@@ -35,7 +40,7 @@ def get_friend_id(insta_user):
     else:
         print 'STATUS NOT OK'
 
-
+#this method will gather the information of the user using their unique id
 def get_friend_info(insta_user):
     friend_id = get_friend_id(insta_user)
     if friend_id == None:
@@ -54,6 +59,7 @@ def get_friend_info(insta_user):
     else:
         print 'STATUS NOT OK'
 
+#this method will show my recent post
 def get_my_post():
     request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % ACCESS_TOKEN
     own_media = requests.get(request_url).json()
@@ -69,8 +75,8 @@ def get_my_post():
     else:
         print 'Status code other than 200 received!'
 
+#this method will get the recent post from one of your friends
 def friend_media():
-    #first i need to search for the user and after that get's its id and store it's id.
     friend_name=raw_input('enter the name of your frnd :')
     url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (friend_name, ACCESS_TOKEN)
     friend_details = requests.get(url).json()
@@ -92,7 +98,7 @@ def friend_media():
     else:
         print 'status error occured'
 
-
+#this method will like your friend's post
 def like_a_post():
     name = raw_input('enter your friend name')
     search_url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (name, ACCESS_TOKEN)
@@ -123,7 +129,7 @@ def like_a_post():
     else:
         print 'STATUS NOT OK'
 
-
+#this method will post a comment on your friend's posts
 def post_a_comment():
     name = raw_input('enter the name of the user :')
     url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (name, ACCESS_TOKEN)
@@ -151,29 +157,82 @@ def post_a_comment():
         else:
             print 'oops! no data found'
     else:
-        print 'aSTATUS NOT OK '
+        print 'STATUS NOT OK '
+#this method will fetch the subtrends and plot a wordcloud for the same
+def plot_wordcloud():
+    name = raw_input('enter the name of the user :')
+    url = (BASE_URL + 'users/search?q=%s&access_token=%s') % (name, ACCESS_TOKEN)
+    friend_details = requests.get(url).json()
+    if friend_details['meta']['code'] == 200:
+        if len(friend_details['data']):
+            #id = []
+            id = (friend_details['data'][0]['id'])
+            if id == None:
+                print 'user id does not exist : '
+            else:
+                url = (BASE_URL + 'users/%s/media/recent/?access_token=%s' % (id, ACCESS_TOKEN))
+                posts_details = requests.get(url).json()
+                if len(posts_details['data']):
+                     k = posts_details['data'][0]['tags']
+                     caption.append(k)
+
+                print caption
+                thefile = open('test.txt','w')
+
+                for item in caption:
+                    thefile.write("%s\n" % item)
+                    thefile.close()
+                    with open('test.txt', 'r') as myfile:
+
+                        data = myfile.read()
+                    print len(data)
+
+
+                    # Generate a word cloud image
+                    wordcloud = WordCloud().generate(data)
+
+                    # Display the generated image:
+                    plt.figure()
+                    plt.imshow(wordcloud, interpolation="bilinear")
+                    plt.axis("off")
+                    plt.show()
+
+
+        else:
+            print 'data does not exist '
+    else:
+        print 'status error '
+
 
 
 def start_app():
-    print 'a. Look into your own account'
-    print 'b. Look into your friends account'
-    print 'c. Look at your recent media'
-    print 'd. Look at your friends recent media'
-    print 'e. Want to like your friends post?'
-    print 'f. Wish to comment on your friends picture? '
+    print termcolor.colored('Welcome to instabot','red')
+    pass_key = int(raw_input('Enter your pass key to access'))
+    if pass_key == 1234 :
+        print termcolor.colored('a. Look into your own account','blue')
+        print termcolor.colored('b. Look into your friends account','blue')
+        print termcolor.colored('c. Look at your recent media','blue')
+        print termcolor.colored('d. Look at your friends recent media','blue')
+        print termcolor.colored('e. Want to like your friends post?','blue')
+        print termcolor.colored('f. Wish to comment on your friends picture?','blue')
+        print termcolor.colored('g. Wish to plot a wordcloud of subtrends from your friends activity?','blue')
 
-    your_choice = raw_input("Enter your choice")
-    if your_choice == "a":
-        my_info()
-    if your_choice == "b":
-        insta_user = raw_input('enter the user name')
-        get_friend_info(insta_user)
-    if your_choice == "c":
-        get_my_post()
-    if your_choice == "d":
-        friend_media()
-    if your_choice == "e":
-        like_a_post()
-    if your_choice == "f":
-        post_a_comment()
+        your_choice = raw_input("Enter your choice")
+        if your_choice == "a":
+            my_info()
+        if your_choice == "b":
+            insta_user = raw_input('enter the user name')
+            get_friend_info(insta_user)
+        if your_choice == "c":
+            get_my_post()
+        if your_choice == "d":
+            friend_media()
+        if your_choice == "e":
+            like_a_post()
+        if your_choice == "f":
+            post_a_comment()
+        if your_choice == "g":
+            plot_wordcloud()
+    else:
+        print 'Enter first four natural numbers'
 start_app()
