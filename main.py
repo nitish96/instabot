@@ -133,7 +133,7 @@ def post_a_comment():
         if len(friend_details['data']):
 
             id = (friend_details['data'][0]['id'])
-            request_url = (url + 'users/%s/media/recent/?access_token=%s' % (id, ACCESS_TOKEN))
+            request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s' % (id, ACCESS_TOKEN))
             show_media_details = requests.get(request_url).json()
             if show_media_details['meta']['code'] == 200:
 
@@ -146,18 +146,12 @@ def post_a_comment():
                     if post_comment['meta']['code'] == 200:
 
                         print('Comment added successfully!')
-                    else:
-                        print 'oops! try again '
-
-                else:
-                    print 'oops!no data found'
-
             else:
-                print 'STATUS NOT OK'
+                print 'STATUS NggOT OK'
         else:
             print 'oops! no data found'
     else:
-        print 'STATUS NOT OK '
+        print 'aSTATUS NOT OK '
 
 
 def start_app():
@@ -166,7 +160,7 @@ def start_app():
     print 'c. Look at your recent media'
     print 'd. Look at your friends recent media'
     print 'e. Want to like your friends post?'
-
+    print 'f. Wish to comment on your friends picture? '
 
     your_choice = raw_input("Enter your choice")
     if your_choice == "a":
@@ -180,4 +174,6 @@ def start_app():
         friend_media()
     if your_choice == "e":
         like_a_post()
+    if your_choice == "f":
+        post_a_comment()
 start_app()
